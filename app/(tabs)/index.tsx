@@ -1,4 +1,5 @@
 import { useChatStore } from '@/store/chatStore'
+import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
   FlatList,
@@ -46,7 +47,10 @@ export default function Chats() {
   }, [messages])
 
   const handleNavigateToChat = () => {
-    console.log('navigate to chat')
+    router.push({
+      pathname: '/(chat)/chat',
+      params: { conversationId: 'test-id' },
+    })
   }
 
   const renderMessagePreview = (item) => (
