@@ -36,7 +36,9 @@ export default function Chats() {
             lastMessageTime: timeSent,
           })
         }
-        return acc
+        return acc.sort(
+          (a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime)
+        )
       }, [])
       setAllChatsPreview(allChatsSummary)
     }
