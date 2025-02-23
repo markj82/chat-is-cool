@@ -1,16 +1,7 @@
 import { useChatStore } from '@/store/chatStore'
 import { useGlobalSearchParams } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
-import {
-  FlatList,
-  Text,
-  TextInput,
-  View,
-  KeyboardAvoidingView,
-  Button,
-  SafeAreaView,
-  Keyboard,
-} from 'react-native'
+import { useMemo, useState } from 'react'
+import { Text, TextInput, View, Button, SafeAreaView } from 'react-native'
 import {
   KeyboardAwareScrollView,
   KeyboardStickyView,
