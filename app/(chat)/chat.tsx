@@ -1,69 +1,91 @@
 import { useChatStore } from '@/store/chatStore'
 import { useGlobalSearchParams } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   FlatList,
-  StyleSheet,
   Text,
   TextInput,
   View,
   KeyboardAvoidingView,
   Button,
+  SafeAreaView,
+  Keyboard,
 } from 'react-native'
+import {
+  KeyboardAwareScrollView,
+  KeyboardStickyView,
+} from 'react-native-keyboard-controller'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export default function ChatScreen() {
-  const [chatMessages, setChatMessages] = useState([])
+  const insets = useSafeAreaInsets()
   const [newMessage, setNewMessage] = useState('')
-  const { messages, updateMessage } = useChatStore()
-  const [participantName, setParticipantName] = useState('')
-  const params = useGlobalSearchParams()
+  const { messages, updateMessage, otherUsers, baseParticipant } =
+    useChatStore()
+  const params = useGlobalSearchParams<{
+    conversationId: string
+    participantId: string
+  }>()
   const chatId = params?.conversationId
+  const participantId = params?.participantId
 
-  useEffect(() => {
-    const filteredMessages = messages.filter(
-      (message) => message.conversationId === chatId
-    )
-    setChatMessages(filteredMessages)
-    const participantName = filteredMessages[0].participants.find(
-      (participant) => participant.baseParticipant === false
-    ).name
-    setParticipantName(participantName)
+  const isNewChat = Boolean(participantId)
+
+  const chatMessages = useMemo(() => {
+    return messages.filter((message) => message.conversationId === chatId)
   }, [messages])
 
+  const participant = useMemo(() => {
+    let participant = null
+
+    if (isNewChat) {
+      participant = otherUsers.find(
+        (_participant) => _participant.participantId === participantId
+      )
+    } else {
+      const firstMessage = chatMessages[0]
+      participant = firstMessage?.participants.find(
+        (participant) => participant.baseParticipant === false
+      )
+    }
+    return participant
+  }, [chatMessages])
+
   const handleSendMessage = () => {
-    updateMessage(newMessage, chatId, true)
+    if (!participant) return
+    updateMessage([baseParticipant, participant], newMessage, chatId, true)
     setNewMessage('')
   }
 
   return (
-    <View style={styles.container}>
-      <Text>{participantName}</Text>
-      {/* todo improve keyboard avoiding view */}
-      <KeyboardAvoidingView>
-        <FlatList
-          style={{ borderColor: 'blue', borderWidth: 1 }}
-          data={chatMessages}
-          renderItem={({ item }) => {
+    <SafeAreaView className="flex-1 bg-white">
+      <Text>{participant?.name || ''}</Text>
+
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={60}
+        contentContainerClassName="flex-1"
+      >
+        <View className="px-2">
+          {chatMessages.map((message) => {
             return (
               <View
+                key={message.timeSent}
                 style={
-                  item.isSenderBaseParticipant
+                  message.isSenderBaseParticipant
                     ? { alignItems: 'flex-end' }
                     : { alignItems: 'flex-start' }
                 }
               >
-                <Text>{item.timeSent}</Text>
-                <Text>{item.message}</Text>
+                <Text>{message.timeSent}</Text>
+                <Text>{message.message}</Text>
               </View>
             )
-          }}
-        />
-        <View
-          style={{
-            borderColor: 'red',
-            borderWidth: 1,
-          }}
-        >
+          })}
+        </View>
+      </KeyboardAwareScrollView>
+      <KeyboardStickyView offset={{ closed: 0, opened: insets.bottom }}>
+        <View className="border-red-500 px-2">
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-between' }}
           >
@@ -75,14 +97,7 @@ export default function ChatScreen() {
             <Button title="Send" onPress={handleSendMessage} />
           </View>
         </View>
-      </KeyboardAvoidingView>
-    </View>
+      </KeyboardStickyView>
+    </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-})

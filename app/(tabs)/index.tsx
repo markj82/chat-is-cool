@@ -1,6 +1,6 @@
-import { useChatStore } from '@/store/chatStore'
+import { Participant, useChatStore } from '@/store/chatStore'
 import { router } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import {
   FlatList,
   StyleSheet,
@@ -10,17 +10,25 @@ import {
 } from 'react-native'
 import { v4 as uuidv4 } from 'uuid'
 
+type ChatPreview = {
+  conversationId: string
+  name: string
+  lastMessage: string
+  lastMessageTime: string
+}
+
 export default function Chats() {
   const { messages, otherUsers } = useChatStore()
-  const [allChatsPreview, setAllChatsPreview] = useState()
 
-  useEffect(() => {
-    const getLastMessages = (messages) => {
-      const allChatsSummary = messages.reduce((acc, message) => {
+  const allChatsPreview = useMemo(() => {
+    if (messages?.length) {
+      const allChatsSummary = messages.reduce((acc: ChatPreview[], message) => {
         const { conversationId, timeSent, message: lastMessage } = message
-        const { name } = message.participants.find(
+
+        const participant = message.participants.find(
           (participant) => participant.baseParticipant === false
         )
+        if (!participant) return acc
         const existingChat = acc.find(
           (chat) => chat.conversationId === conversationId
         )
@@ -32,21 +40,20 @@ export default function Chats() {
         } else {
           acc.push({
             conversationId,
-            name,
+            name: participant.name,
             lastMessage,
             lastMessageTime: timeSent,
           })
         }
         return acc.sort(
-          (a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime)
+          (a, b) =>
+            new Date(b.lastMessageTime).getTime() -
+            new Date(a.lastMessageTime).getTime()
         )
       }, [])
-      setAllChatsPreview(allChatsSummary)
+      return allChatsSummary
     }
-
-    if (messages?.length) {
-      getLastMessages(messages)
-    }
+    return []
   }, [messages])
 
   const handleNavigateToChat = (id: string, participantName: string) => {
@@ -56,37 +63,54 @@ export default function Chats() {
     })
   }
 
-  const handleStartNewChat = () => {
+  const handleStartNewChat = (participant: Participant) => {
+    const chatWithThisParticipant = messages.find((message) => {
+      const p = message.participants.find(
+        (participant) => participant.baseParticipant === false
+      )
+      if (p) {
+        return p.participantId === participant.participantId
+      }
+    })
+
     const newConversationId = uuidv4()
-    // const newConversationId = `conv-3-${Math.random() * 1000}`
-    console.log('newConversationId', newConversationId)
+    router.push({
+      pathname: '/(chat)/chat',
+      params: {
+        conversationId:
+          chatWithThisParticipant?.conversationId || newConversationId,
+        participantId: participant.participantId,
+      },
+    })
   }
 
-  const renderMessagePreview = (item) => (
+  const renderMessagePreview = (chatPreviewItem: ChatPreview) => (
     <TouchableOpacity
       style={{ borderColor: 'green', borderWidth: 1, padding: 10 }}
-      onPress={() => handleNavigateToChat(item.conversationId, 'mr-test')}
-      key={item.conversationId}
+      onPress={() =>
+        handleNavigateToChat(chatPreviewItem.conversationId, 'mr-test')
+      }
+      key={chatPreviewItem.conversationId}
     >
       <Text
         className="text-red-500"
         style={{ fontSize: 16, fontWeight: '600' }}
       >
-        {item.name}
+        {chatPreviewItem.name}
       </Text>
       <Text style={{ fontSize: 14, fontWeight: '400' }}>
-        {item.lastMessage}
+        {chatPreviewItem.lastMessage}
       </Text>
     </TouchableOpacity>
   )
 
-  const renderOtherUsers = (item) => (
+  const renderOtherUsers = (participantItem: Participant) => (
     <TouchableOpacity
       style={{ borderColor: 'green', borderWidth: 1, padding: 7 }}
-      onPress={handleStartNewChat}
-      key={item.participantId}
+      onPress={() => handleStartNewChat(participantItem)}
+      key={participantItem.participantId}
     >
-      <Text>{item.name}</Text>
+      <Text>{participantItem.name}</Text>
     </TouchableOpacity>
   )
 
