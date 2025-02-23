@@ -9,3 +9,7 @@ This app uses native packages, so please create a build first
 ## Running the app
 
 Please run `npx expo start` to spin up development server
+
+## Running the tests
+
+Please run `npm run test`
