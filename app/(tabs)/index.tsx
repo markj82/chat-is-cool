@@ -2,13 +2,7 @@ import { Participant, useChatStore } from '@/store/chatStore'
 import { formatDate } from '@/utils/date-helpers'
 import { router } from 'expo-router'
 import { useMemo } from 'react'
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { FlatList, Text, TouchableOpacity, View } from 'react-native'
 import { v4 as uuidv4 } from 'uuid'
 
 type ChatPreview = {
@@ -87,20 +81,19 @@ export default function Chats() {
 
   const renderMessagePreview = (chatPreviewItem: ChatPreview) => (
     <TouchableOpacity
-      style={{ borderColor: 'green', borderWidth: 1, padding: 10 }}
+      className="bg-blue-100 m-1 px-5 py-6 self-center rounded-lg w-[90%]"
       onPress={() =>
         handleNavigateToChat(chatPreviewItem.conversationId, 'mr-test')
       }
       key={chatPreviewItem.conversationId}
     >
-      <Text>{formatDate(chatPreviewItem.lastMessageTime)}</Text>
-      <Text
-        className="text-red-500"
-        style={{ fontSize: 16, fontWeight: '600' }}
-      >
+      <Text className="text-sm text-gray-500 text-right">
+        {formatDate(chatPreviewItem.lastMessageTime)}
+      </Text>
+      <Text className="text-blue-900 text-lg font-bold">
         {chatPreviewItem.name}
       </Text>
-      <Text style={{ fontSize: 14, fontWeight: '400' }}>
+      <Text className="text-m text-gray-900">
         {chatPreviewItem.lastMessage}
       </Text>
     </TouchableOpacity>
@@ -108,51 +101,29 @@ export default function Chats() {
 
   const renderOtherUsers = (participantItem: Participant) => (
     <TouchableOpacity
-      style={{ borderColor: 'green', borderWidth: 1, padding: 7 }}
+      className="bg-pink-100 m-1 px-5 py-6 self-center rounded-lg"
       onPress={() => handleStartNewChat(participantItem)}
       key={participantItem.participantId}
     >
-      <Text>{participantItem.name}</Text>
+      <Text className="text-sm font-bold text-gray-700">
+        {participantItem.name}
+      </Text>
     </TouchableOpacity>
   )
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 content-center bg-white h-[10%]">
       <FlatList
-        style={{ borderColor: 'red', borderWidth: 1, height: '10%' }}
         horizontal
         showsHorizontalScrollIndicator={false}
         data={otherUsers}
         renderItem={({ item }) => renderOtherUsers(item)}
       />
       <FlatList
-        style={{
-          borderColor: 'blue',
-          borderWidth: 1,
-          height: '90%',
-          width: '100%',
-        }}
+        className="h-[90%]"
         data={allChatsPreview}
         renderItem={({ item }) => renderMessagePreview(item)}
       />
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-})

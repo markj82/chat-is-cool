@@ -58,19 +58,20 @@ export default function ChatScreen() {
         bottomOffset={60}
         contentContainerClassName="flex-1"
       >
-        <View className="px-2">
+        <View className="px-2 bg-white">
           {chatMessages.map((message) => {
+            const bubbleStyle = message.isSenderBaseParticipant
+              ? 'bg-blue-300 self-end'
+              : 'bg-pink-200 self-start'
             return (
               <View
+                className={`flex flex-col p-2 my-2 rounded-lg ${bubbleStyle}`}
                 key={message.timeSent}
-                style={
-                  message.isSenderBaseParticipant
-                    ? { alignItems: 'flex-end' }
-                    : { alignItems: 'flex-start' }
-                }
               >
-                <Text>{formatDate(message.timeSent)}</Text>
-                <Text>{message.message}</Text>
+                <Text className="text-xs text-gray-900">
+                  {formatDate(message.timeSent)}
+                </Text>
+                <Text className="text-lg">{message.message}</Text>
               </View>
             )
           })}
