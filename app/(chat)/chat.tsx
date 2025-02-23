@@ -15,6 +15,7 @@ export default function ChatScreen() {
   const [chatMessages, setChatMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const { messages, updateMessage } = useChatStore()
+  const [participantName, setParticipantName] = useState('')
   const params = useGlobalSearchParams()
   const chatId = params?.conversationId
 
@@ -23,6 +24,10 @@ export default function ChatScreen() {
       (message) => message.conversationId === chatId
     )
     setChatMessages(filteredMessages)
+    const participantName = filteredMessages[0].participants.find(
+      (participant) => participant.baseParticipant === false
+    ).name
+    setParticipantName(participantName)
   }, [messages])
 
   const handleSendMessage = () => {
@@ -32,6 +37,7 @@ export default function ChatScreen() {
 
   return (
     <View style={styles.container}>
+      <Text>{participantName}</Text>
       {/* todo improve keyboard avoiding view */}
       <KeyboardAvoidingView>
         <FlatList
