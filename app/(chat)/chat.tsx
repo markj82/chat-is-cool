@@ -14,7 +14,6 @@ import {
 export default function ChatScreen() {
   const [chatMessages, setChatMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
-  console.log('🌴 newMessage: ', newMessage)
   const { messages, updateMessage } = useChatStore()
   const params = useGlobalSearchParams()
   const chatId = params?.conversationId
