@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function Chats() {
   const { messages, otherUsers } = useChatStore()
@@ -48,20 +49,31 @@ export default function Chats() {
     }
   }, [messages])
 
-  const handleNavigateToChat = (id: string) => {
+  const handleNavigateToChat = (id: string, participantName: string) => {
     router.push({
       pathname: '/(chat)/chat',
-      params: { conversationId: id },
+      params: { conversationId: id, participantName },
     })
+  }
+
+  const handleStartNewChat = () => {
+    const newConversationId = uuidv4()
+    // const newConversationId = `conv-3-${Math.random() * 1000}`
+    console.log('newConversationId', newConversationId)
   }
 
   const renderMessagePreview = (item) => (
     <TouchableOpacity
       style={{ borderColor: 'green', borderWidth: 1, padding: 10 }}
-      onPress={() => handleNavigateToChat(item.conversationId)}
+      onPress={() => handleNavigateToChat(item.conversationId, 'mr-test')}
       key={item.conversationId}
     >
-      <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.name}</Text>
+      <Text
+        className="text-red-500"
+        style={{ fontSize: 16, fontWeight: '600' }}
+      >
+        {item.name}
+      </Text>
       <Text style={{ fontSize: 14, fontWeight: '400' }}>
         {item.lastMessage}
       </Text>
@@ -71,6 +83,7 @@ export default function Chats() {
   const renderOtherUsers = (item) => (
     <TouchableOpacity
       style={{ borderColor: 'green', borderWidth: 1, padding: 7 }}
+      onPress={handleStartNewChat}
       key={item.participantId}
     >
       <Text>{item.name}</Text>
