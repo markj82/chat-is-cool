@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 
 export default function Chats() {
-  const { messages } = useChatStore()
+  const { messages, otherUsers } = useChatStore()
   const [allChatsPreview, setAllChatsPreview] = useState()
 
   useEffect(() => {
@@ -56,7 +56,11 @@ export default function Chats() {
   }
 
   const renderMessagePreview = (item) => (
-    <TouchableOpacity onPress={() => handleNavigateToChat(item.conversationId)}>
+    <TouchableOpacity
+      style={{ borderColor: 'green', borderWidth: 1, padding: 10 }}
+      onPress={() => handleNavigateToChat(item.conversationId)}
+      key={item.conversationId}
+    >
       <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.name}</Text>
       <Text style={{ fontSize: 14, fontWeight: '400' }}>
         {item.lastMessage}
@@ -64,9 +68,31 @@ export default function Chats() {
     </TouchableOpacity>
   )
 
+  const renderOtherUsers = (item) => (
+    <TouchableOpacity
+      style={{ borderColor: 'green', borderWidth: 1, padding: 7 }}
+      key={item.participantId}
+    >
+      <Text>{item.name}</Text>
+    </TouchableOpacity>
+  )
+
   return (
     <View style={styles.container}>
       <FlatList
+        style={{ borderColor: 'red', borderWidth: 1, height: '10%' }}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={otherUsers}
+        renderItem={({ item }) => renderOtherUsers(item)}
+      />
+      <FlatList
+        style={{
+          borderColor: 'blue',
+          borderWidth: 1,
+          height: '90%',
+          width: '100%',
+        }}
         data={allChatsPreview}
         renderItem={({ item }) => renderMessagePreview(item)}
       />
