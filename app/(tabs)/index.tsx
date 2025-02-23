@@ -1,4 +1,5 @@
 import { Participant, useChatStore } from '@/store/chatStore'
+import { formatDate } from '@/utils/date-helpers'
 import { router } from 'expo-router'
 import { useMemo } from 'react'
 import {
@@ -92,6 +93,7 @@ export default function Chats() {
       }
       key={chatPreviewItem.conversationId}
     >
+      <Text>{formatDate(chatPreviewItem.lastMessageTime)}</Text>
       <Text
         className="text-red-500"
         style={{ fontSize: 16, fontWeight: '600' }}

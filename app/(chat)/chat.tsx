@@ -16,6 +16,7 @@ import {
   KeyboardStickyView,
 } from 'react-native-keyboard-controller'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { formatDate } from '@/utils/date-helpers'
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets()
@@ -77,7 +78,7 @@ export default function ChatScreen() {
                     : { alignItems: 'flex-start' }
                 }
               >
-                <Text>{message.timeSent}</Text>
+                <Text>{formatDate(message.timeSent)}</Text>
                 <Text>{message.message}</Text>
               </View>
             )
