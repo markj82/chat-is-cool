@@ -1,7 +1,16 @@
 import { useChatStore } from '@/store/chatStore'
-import { useGlobalSearchParams } from 'expo-router'
+import { router, useGlobalSearchParams } from 'expo-router'
 import { useMemo, useState } from 'react'
-import { Text, TextInput, View, Button, SafeAreaView } from 'react-native'
+import {
+  Text,
+  TextInput,
+  View,
+  Button,
+  SafeAreaView,
+  Touchable,
+  TouchableOpacity,
+} from 'react-native'
+import Ionicons from '@expo/vector-icons/Ionicons'
 import {
   KeyboardAwareScrollView,
   KeyboardStickyView,
@@ -51,9 +60,17 @@ export default function ChatScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <Text>{participant?.name || ''}</Text>
+      <TouchableOpacity onPress={() => router.back()}>
+        <Ionicons name="arrow-back-outline" size={32} color="grey" />
+      </TouchableOpacity>
+      <View className="flex flex-row items-center justify-center">
+        <Text className=" content-around text-lg text-center text-gray-600 bg-yellow-300 w-[40%] rounded-lg">
+          {participant?.name || ''}
+        </Text>
+      </View>
 
       <KeyboardAwareScrollView
+        className="flex-1"
         keyboardShouldPersistTaps="handled"
         bottomOffset={60}
         contentContainerClassName="flex-1"
@@ -79,10 +96,9 @@ export default function ChatScreen() {
       </KeyboardAwareScrollView>
       <KeyboardStickyView offset={{ closed: 0, opened: insets.bottom }}>
         <View className="border-red-500 px-2">
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
-          >
+          <View className="flex flex-row items-center justify-between bg-white border-slate-200 border rounded-lg">
             <TextInput
+              className="flex-1 p-2 w-[90%]"
               placeholder="Type a message"
               value={newMessage}
               onChangeText={setNewMessage}
