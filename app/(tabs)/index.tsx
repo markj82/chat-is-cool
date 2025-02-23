@@ -46,15 +46,15 @@ export default function Chats() {
     }
   }, [messages])
 
-  const handleNavigateToChat = () => {
+  const handleNavigateToChat = (id: string) => {
     router.push({
       pathname: '/(chat)/chat',
-      params: { conversationId: 'test-id' },
+      params: { conversationId: id },
     })
   }
 
   const renderMessagePreview = (item) => (
-    <TouchableOpacity onPress={() => handleNavigateToChat()}>
+    <TouchableOpacity onPress={() => handleNavigateToChat(item.conversationId)}>
       <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.name}</Text>
       <Text style={{ fontSize: 14, fontWeight: '400' }}>
         {item.lastMessage}
