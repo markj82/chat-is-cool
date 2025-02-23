@@ -237,12 +237,12 @@ export const useChatStore = create<ChatStore>()(
       otherUsers: participantsInit,
       baseParticipant,
       createNewMessage: () => {},
-      updateMessage: (
+      updateMessage: async (
         participants: Participant[],
         message: string,
         conversationId: string,
         isSenderBaseParticipant: boolean
-      ) =>
+      ) => {
         set((state) => {
           return {
             messages: [
@@ -256,7 +256,25 @@ export const useChatStore = create<ChatStore>()(
               },
             ],
           }
-        }),
+        })
+        const reply = 'I am fine, thank you!'
+        setTimeout(() => {
+          set((state) => {
+            return {
+              messages: [
+                ...state.messages,
+                {
+                  conversationId,
+                  participants,
+                  timeSent: new Date().toISOString(),
+                  message: reply,
+                  isSenderBaseParticipant: !isSenderBaseParticipant,
+                },
+              ],
+            }
+          })
+        }, 1000)
+      },
     }),
     {
       name: 'chat-storage',
