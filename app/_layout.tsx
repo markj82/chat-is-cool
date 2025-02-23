@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import 'react-native-reanimated'
 import 'react-native-get-random-values'
 import './global.css'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,8 +47,10 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <KeyboardProvider>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </KeyboardProvider>
   )
 }
