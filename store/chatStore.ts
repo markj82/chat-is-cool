@@ -2,6 +2,12 @@ import { create } from 'zustand'
 import { zustandStorage } from './mmkv'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
+const baseParticipant = {
+  name: 'Marek',
+  participantId: '001',
+  baseParticipant: true,
+}
+
 const participantsInit = [
   {
     name: 'John',
