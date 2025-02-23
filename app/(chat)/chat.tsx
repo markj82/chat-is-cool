@@ -1,11 +1,21 @@
 import { useChatStore } from '@/store/chatStore'
 import { useGlobalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  KeyboardAvoidingView,
+  Button,
+} from 'react-native'
 
 export default function ChatScreen() {
   const [chatMessages, setChatMessages] = useState([])
-  const { messages } = useChatStore()
+  const [newMessage, setNewMessage] = useState('')
+  console.log('🌴 newMessage: ', newMessage)
+  const { messages, updateMessage } = useChatStore()
   const params = useGlobalSearchParams()
   const chatId = params?.conversationId
 
@@ -16,26 +26,51 @@ export default function ChatScreen() {
     setChatMessages(filteredMessages)
   }, [messages])
 
+  const handleSendMessage = () => {
+    updateMessage(newMessage, chatId, true)
+    setNewMessage('')
+  }
+
   return (
     <View style={styles.container}>
-      <FlatList
-        data={chatMessages}
-        renderItem={({ item }) => {
-          console.log('🌴 item: ', JSON.stringify(item))
-          return (
-            <View
-              style={
-                item.isSenderBaseParticipant
-                  ? { alignItems: 'flex-end' }
-                  : { alignItems: 'flex-start' }
-              }
-            >
-              <Text>{item.timeSent}</Text>
-              <Text>{item.message}</Text>
-            </View>
-          )
-        }}
-      />
+      {/* todo improve keyboard avoiding view */}
+      <KeyboardAvoidingView>
+        <FlatList
+          style={{ borderColor: 'blue', borderWidth: 1 }}
+          data={chatMessages}
+          renderItem={({ item }) => {
+            return (
+              <View
+                style={
+                  item.isSenderBaseParticipant
+                    ? { alignItems: 'flex-end' }
+                    : { alignItems: 'flex-start' }
+                }
+              >
+                <Text>{item.timeSent}</Text>
+                <Text>{item.message}</Text>
+              </View>
+            )
+          }}
+        />
+        <View
+          style={{
+            borderColor: 'red',
+            borderWidth: 1,
+          }}
+        >
+          <View
+            style={{ flexDirection: 'row', justifyContent: 'space-between' }}
+          >
+            <TextInput
+              placeholder="Type a message"
+              value={newMessage}
+              onChangeText={setNewMessage}
+            />
+            <Button title="Send" onPress={handleSendMessage} />
+          </View>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   )
 }

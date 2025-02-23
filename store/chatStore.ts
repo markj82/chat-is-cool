@@ -78,5 +78,27 @@ const messagesInit = [
 export const useChatStore = create((set) => ({
   messages: messagesInit,
   createNewMessage: () => {},
-  updateMessage: () => {},
+  updateMessage: (
+    message: string,
+    conversationId: string,
+    isSenderBaseParticipant: boolean
+  ) =>
+    set((state: any) => {
+      return {
+        messages: [
+          ...state.messages,
+          {
+            conversationId,
+            participants: [
+              ...state.messages.find(
+                (message) => message.conversationId === conversationId
+              ).participants,
+            ],
+            timeSent: new Date().toISOString(),
+            message,
+            isSenderBaseParticipant,
+          },
+        ],
+      }
+    }),
 }))
