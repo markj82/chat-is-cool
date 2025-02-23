@@ -80,6 +80,7 @@ const messagesInit = [
 export const useChatStore = create<any>()(
   persist(
     (set) => ({
+      userName: 'Marek',
       messages: messagesInit,
       createNewMessage: () => {},
       updateMessage: (
