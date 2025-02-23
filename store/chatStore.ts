@@ -2,13 +2,41 @@ import { create } from 'zustand'
 import { zustandStorage } from './mmkv'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-const baseParticipant = {
+export type Participant = {
+  name: string
+  participantId: string
+  baseParticipant: boolean
+}
+
+export type Message = {
+  conversationId: string
+  participants: Participant[]
+  timeSent: string
+  message: string
+  isSenderBaseParticipant: boolean
+}
+
+type ChatStore = {
+  userName: string
+  messages: Message[]
+  baseParticipant: Participant
+  otherUsers: Participant[]
+  createNewMessage: () => void
+  updateMessage: (
+    participants: Participant[],
+    message: string,
+    conversationId: string,
+    isSenderBaseParticipant: boolean
+  ) => void
+}
+
+const baseParticipant: Participant = {
   name: 'Marek',
   participantId: '001',
   baseParticipant: true,
 }
 
-const participantsInit = [
+const participantsInit: Participant[] = [
   {
     name: 'John',
     participantId: '002',
@@ -126,7 +154,7 @@ const participantsInit = [
   },
 ]
 
-const messagesInit = [
+const messagesInit: Message[] = [
   {
     conversationId: 'conv-1',
     participants: [
@@ -201,29 +229,27 @@ const messagesInit = [
   },
 ]
 
-export const useChatStore = create<any>()(
+export const useChatStore = create<ChatStore>()(
   persist(
     (set) => ({
       userName: 'Marek',
       messages: messagesInit,
       otherUsers: participantsInit,
+      baseParticipant,
       createNewMessage: () => {},
       updateMessage: (
+        participants: Participant[],
         message: string,
         conversationId: string,
         isSenderBaseParticipant: boolean
       ) =>
-        set((state: any) => {
+        set((state) => {
           return {
             messages: [
               ...state.messages,
               {
                 conversationId,
-                participants: [
-                  ...state.messages.find(
-                    (message) => message.conversationId === conversationId
-                  ).participants,
-                ],
+                participants: participants,
                 timeSent: new Date().toISOString(),
                 message,
                 isSenderBaseParticipant,
