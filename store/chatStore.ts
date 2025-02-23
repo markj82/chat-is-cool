@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { zustandStorage } from './mmkv'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 const messagesInit = [
   {
@@ -75,30 +77,38 @@ const messagesInit = [
   },
 ]
 
-export const useChatStore = create((set) => ({
-  messages: messagesInit,
-  createNewMessage: () => {},
-  updateMessage: (
-    message: string,
-    conversationId: string,
-    isSenderBaseParticipant: boolean
-  ) =>
-    set((state: any) => {
-      return {
-        messages: [
-          ...state.messages,
-          {
-            conversationId,
-            participants: [
-              ...state.messages.find(
-                (message) => message.conversationId === conversationId
-              ).participants,
+export const useChatStore = create<any>()(
+  persist(
+    (set) => ({
+      messages: messagesInit,
+      createNewMessage: () => {},
+      updateMessage: (
+        message: string,
+        conversationId: string,
+        isSenderBaseParticipant: boolean
+      ) =>
+        set((state: any) => {
+          return {
+            messages: [
+              ...state.messages,
+              {
+                conversationId,
+                participants: [
+                  ...state.messages.find(
+                    (message) => message.conversationId === conversationId
+                  ).participants,
+                ],
+                timeSent: new Date().toISOString(),
+                message,
+                isSenderBaseParticipant,
+              },
             ],
-            timeSent: new Date().toISOString(),
-            message,
-            isSenderBaseParticipant,
-          },
-        ],
-      }
+          }
+        }),
     }),
-}))
+    {
+      name: 'chat-storage',
+      storage: createJSONStorage(() => zustandStorage),
+    }
+  )
+)
