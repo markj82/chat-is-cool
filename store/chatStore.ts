@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { zustandStorage } from './mmkv'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { generateResponse } from '@/services/open-ai'
 
 export type Participant = {
   name: string
@@ -257,7 +258,7 @@ export const useChatStore = create<ChatStore>()(
             ],
           }
         })
-        const reply = 'I am fine, thank you!'
+        const reply = await generateResponse(message)
         setTimeout(() => {
           set((state) => {
             return {
